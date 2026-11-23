@@ -1,0 +1,44 @@
+name: Haftalik baza zaxira nusxasi
+
+on:
+  schedule:
+    - cron: "0 3 * * 0" # har yakshanba 03:00 UTC
+  workflow_dispatch: # qo'lda ishga tushirish: Actions -> Run workflow
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: PostgreSQL 17 klientini o'rnatish (Supabase PG17 ishlatadi)
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-17
+
+      - name: Bazani dump qilish
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SUPABASE_DB_URL:-}" ]; then echo "::error::SUPABASE_DB_URL secret kiritilmagan"; exit 1; fi
+          STAMP=$(date -u +%Y-%m-%d)
+          mkdir -p out
+          # public (kontent) va auth (foydalanuvchilar) sxemalari, sxema + ma'lumot, siqilgan format
+          pg_dump "$SUPABASE_DB_URL" --format=custom --no-owner --no-privileges \
+            --schema=public --schema=auth --file="out/maktab-db-$STAMP.dump"
+          test -s "out/maktab-db-$STAMP.dump"
+          ls -lh out
+
+      - name: Artifact sifatida saqlash (90 kun)
+        uses: actions/upload-artifact@v4
+        with:
+          name: maktab-db-backup
+          path: out/*.dump
+          retention-days: 90
+          if-no-files-found: error

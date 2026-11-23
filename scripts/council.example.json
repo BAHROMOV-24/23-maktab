@@ -1,0 +1,30 @@
+{
+  "maslahatchi": {
+    "first_name": "Dilnoza",
+    "last_name": "Karimova",
+    "direction_name": "Maktab maslahatchisi"
+  },
+  "lider": {
+    "first_name": "Jasur",
+    "last_name": "Rahimov",
+    "grade": "11-A",
+    "direction_name": "Kengash lideri",
+    "direction_description": "Kengash faoliyatini muvofiqlashtiradi."
+  },
+  "koordinatorlar": [
+    {
+      "first_name": "Madina",
+      "last_name": "Yusupova",
+      "grade": "10-B",
+      "direction_name": "Ta'lim va fanlar",
+      "direction_description": "Olimpiadalar, fan to'garaklari va o'quv tadbirlari."
+    },
+    {
+      "first_name": "Sardor",
+      "last_name": "Aliyev",
+      "grade": "10-A",
+      "direction_name": "Sport",
+      "direction_description": "Sport musobaqalari va sog'lom turmush tarzi."
+    }
+  ]
+}
